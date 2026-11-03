@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Staf — IDB Space</title>
+  <meta name="description" content="Dashboard staf IDB Space: antrean pengajuan real-time, verifikasi aturan, dan konfirmasi cepat.">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="app-shell">
+  <header class="site-header site-header--solid">
+    <div class="wrap">
+      <a class="brand" href="index.html" aria-label="IDB Space, beranda">
+        <img class="brand__logo brand__logo--dark" src="assets/img/logo-idb.png" alt="IDB Bali">
+        <span class="brand__name">
+          <strong>IDB Space</strong>
+          <span>Ruang Kampus IDB Bali</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Navigasi">
+        <a href="index.html">Beranda</a>
+        <a href="pinjam.html">Pinjam ruangan</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="dash">
+    <div class="wrap">
+      <div class="dash-head">
+        <div>
+          <h1>Dashboard staf</h1>
+          <p>Antrean pengajuan peminjaman ruangan kampus IDB Bali.</p>
+        </div>
+        <span class="live-dot" id="live-status">Terhubung · real-time</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat stat--amber">
+          <div class="stat__value" id="stat-menunggu">0</div>
+          <div class="stat__label">Menunggu keputusan</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value" id="stat-perbaikan">0</div>
+          <div class="stat__label">Perlu perbaikan</div>
+        </div>
+        <div class="stat stat--green">
+          <div class="stat__value" id="stat-disetujui">0</div>
+          <div class="stat__label">Disetujui</div>
+        </div>
+        <div class="stat stat--red">
+          <div class="stat__value" id="stat-ditolak">0</div>
+          <div class="stat__label">Ditolak</div>
+        </div>
+      </div>
+
+      <div class="tabs" id="tabs" role="tablist" aria-label="Filter status">
+        <button class="tab is-active" data-tab="semua" role="tab">Semua <span class="count" data-count="semua">0</span></button>
+        <button class="tab" data-tab="menunggu" role="tab">Menunggu <span class="count" data-count="menunggu">0</span></button>
+        <button class="tab" data-tab="perlu-perbaikan" role="tab">Perlu Perbaikan <span class="count" data-count="perlu-perbaikan">0</span></button>
+        <button class="tab" data-tab="disetujui" role="tab">Disetujui <span class="count" data-count="disetujui">0</span></button>
+        <button class="tab" data-tab="ditolak" role="tab">Ditolak <span class="count" data-count="ditolak">0</span></button>
+      </div>
+
+      <div class="toolbar">
+        <input class="input grow" type="search" id="search" placeholder="Cari nama, kegiatan, atau nomor referensi…" aria-label="Cari pengajuan">
+        <select class="select" id="filter-room" aria-label="Filter ruangan">
+          <option value="">Semua ruangan</option>
+        </select>
+        <input class="input" type="date" id="filter-date" aria-label="Filter tanggal">
+        <button class="btn btn--subtle btn--sm" type="button" id="reset-filter">Reset</button>
+      </div>
+
+      <div class="queue" id="queue"></div>
+    </div>
+  </main>
+
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title" aria-hidden="true">
+    <div class="drawer__head">
+      <div>
+        <h2 id="drawer-title">Detail pengajuan</h2>
+        <p id="drawer-ref" style="margin:0;font-size:.8rem;color:var(--muted);"></p>
+      </div>
+      <button class="drawer__close" id="drawer-close" type="button" aria-label="Tutup">&times;</button>
+    </div>
+    <div class="drawer__body" id="drawer-body"></div>
+    <div class="drawer__foot" id="drawer-foot"></div>
+  </aside>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script src="assets/js/staf.js"></script>
+</body>
+</html>

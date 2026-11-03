@@ -1,0 +1,220 @@
+/* IDB Space — PRD document styling (screen + print) */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+:root {
+  --navy: #14395f;
+  --navy-deep: #0e2b48;
+  --ink: #1f2937;
+  --muted: #5b6b7c;
+  --line: #d9e2ec;
+  --line-soft: #e8eef5;
+  --row: #f4f7fb;
+  --callout: #eaf1f8;
+  --gold: #a9822a;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: #e7ecf2;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 10.6pt;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 24px auto;
+  background: #fff;
+  padding: 20mm 18mm 22mm;
+  box-shadow: 0 18px 50px rgba(15, 35, 60, 0.16);
+}
+
+/* Cover */
+.cover {
+  text-align: center;
+  padding-top: 26mm;
+  break-after: page;
+  page-break-after: always;
+}
+.cover__brand {
+  display: inline-block;
+  margin-bottom: 26px;
+}
+.cover__brand img { height: 58px; width: auto; }
+.cover__eyebrow {
+  font-size: 8.6pt;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+.cover h1 {
+  font-size: 40pt;
+  line-height: 1;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+  font-weight: 700;
+}
+.cover__tagline {
+  font-size: 14pt;
+  color: #47576a;
+  margin: 0 0 30px;
+}
+.cover__rule {
+  width: 86px;
+  height: 2px;
+  background: var(--navy);
+  margin: 0 auto 30px;
+}
+.cover__subtitle {
+  font-size: 13pt;
+  color: #47576a;
+  margin: 0 0 36px;
+}
+
+/* Tables */
+.info-table,
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 18px;
+  font-size: 9.8pt;
+}
+.info-table th,
+.tbl th {
+  background: var(--navy);
+  color: #fff;
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 10px;
+  border: 1px solid var(--navy);
+  vertical-align: top;
+}
+.info-table td,
+.tbl td {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  vertical-align: top;
+}
+.tbl tbody tr:nth-child(even) td { background: var(--row); }
+.info-table { width: 100%; }
+.info-table td:first-child { width: 32%; font-weight: 600; color: #33475b; }
+
+/* Callout */
+.callout {
+  background: var(--callout);
+  border-radius: 4px;
+  padding: 16px 20px;
+  font-size: 10.4pt;
+  color: #22364c;
+  margin: 22px 0;
+}
+.callout strong { color: var(--navy); }
+.note {
+  font-size: 9pt;
+  color: var(--muted);
+  font-style: italic;
+  margin: 4px 0 18px;
+}
+
+/* Sections */
+.doc-section { break-before: page; page-break-before: always; }
+.doc-section:first-of-type { break-before: auto; page-break-before: auto; }
+
+h2 {
+  font-size: 18pt;
+  color: var(--navy);
+  margin: 0 0 14px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+h3 {
+  font-size: 13pt;
+  color: var(--navy);
+  margin: 24px 0 8px;
+  font-weight: 700;
+}
+h4 {
+  font-size: 10.8pt;
+  color: #22364c;
+  margin: 16px 0 6px;
+}
+p { margin: 0 0 12px; }
+ul, ol { margin: 0 0 14px; padding-left: 20px; }
+li { margin-bottom: 5px; }
+strong { color: #17293c; }
+.lead { font-size: 11.4pt; color: #33475b; }
+
+/* Flow strip */
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+  margin: 14px 0 20px;
+}
+.flow__step {
+  flex: 1 1 0;
+  min-width: 90px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 4px;
+  padding: 10px 10px;
+  font-size: 8.8pt;
+  line-height: 1.3;
+}
+.flow__step b {
+  display: block;
+  font-size: 8pt;
+  opacity: 0.62;
+  margin-bottom: 4px;
+  letter-spacing: 0.12em;
+}
+.flow__arrow {
+  align-self: center;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* Status labels used inline in text */
+.k {
+  display: inline-block;
+  background: var(--row);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0 5px;
+  font-size: 9pt;
+  font-weight: 600;
+  color: var(--navy-deep);
+}
+
+.print-foot { display: none; }
+
+@media print {
+  body { background: #fff; font-size: 10.4pt; }
+  .page {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  .cover { padding-top: 8mm; }
+  .doc-section { break-before: page; page-break-before: always; }
+  .doc-section:first-of-type { break-before: auto; page-break-before: auto; }
+  .tbl, .info-table, .callout, .flow, h3 { break-inside: avoid; page-break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+}

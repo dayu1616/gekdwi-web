@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-label="Ilustrasi kemasan biji kopi dan biji kopi yang tersebar">
+  <defs>
+    <linearGradient id="bgB" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6E7F62"/>
+      <stop offset="1" stop-color="#53634A"/>
+    </linearGradient>
+    <linearGradient id="bag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EBDCC4"/>
+      <stop offset="1" stop-color="#D3B48B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="560" fill="url(#bgB)"/>
+  <circle cx="360" cy="280" r="220" fill="#7C8D70" opacity="0.5"/>
+
+  <g transform="translate(250 96)">
+    <path d="M0 40h220l-14 380H14z" fill="url(#bag)"/>
+    <path d="M0 40h220l-4 40H4z" fill="#E3CEAE"/>
+    <path d="M10 80h200" stroke="#B99B74" stroke-width="2" stroke-dasharray="6 7"/>
+    <rect x="46" y="150" width="128" height="128" rx="64" fill="#3A2418"/>
+    <g fill="none" stroke="#E9DBC6" stroke-width="4">
+      <path d="M70 214q40-34 80 0"/>
+      <path d="M110 174v80"/>
+    </g>
+    <text x="110" y="330" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#3A2418" font-weight="bold">SENJA</text>
+    <text x="110" y="358" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" letter-spacing="4" fill="#6B4E35">SINGLE ORIGIN</text>
+    <path d="M34 388h152" stroke="#B99B74" stroke-width="2"/>
+    <text x="110" y="412" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="12" fill="#6B4E35">GAYO · 250 G</text>
+  </g>
+
+  <g fill="#3A2418">
+    <g transform="translate(120 120) rotate(-24)">
+      <ellipse rx="20" ry="30" fill="#3A2418"/>
+      <path d="M0-24v48" stroke="#8B6A4A" stroke-width="4"/>
+    </g>
+    <g transform="translate(560 150) rotate(30)">
+      <ellipse rx="18" ry="27" fill="#3A2418"/>
+      <path d="M0-21v42" stroke="#8B6A4A" stroke-width="4"/>
+    </g>
+    <g transform="translate(520 380) rotate(-12)">
+      <ellipse rx="22" ry="32" fill="#3A2418"/>
+      <path d="M0-26v52" stroke="#8B6A4A" stroke-width="4"/>
+    </g>
+    <g transform="translate(150 420) rotate(18)">
+      <ellipse rx="19" ry="29" fill="#3A2418"/>
+      <path d="M0-23v46" stroke="#8B6A4A" stroke-width="4"/>
+    </g>
+    <g transform="translate(620 300) rotate(48)">
+      <ellipse rx="16" ry="24" fill="#3A2418"/>
+      <path d="M0-19v38" stroke="#8B6A4A" stroke-width="3"/>
+    </g>
+    <g transform="translate(90 280) rotate(-38)">
+      <ellipse rx="16" ry="24" fill="#3A2418"/>
+      <path d="M0-19v38" stroke="#8B6A4A" stroke-width="3"/>
+    </g>
+    <g transform="translate(600 470) rotate(8)">
+      <ellipse rx="17" ry="25" fill="#3A2418"/>
+      <path d="M0-20v40" stroke="#8B6A4A" stroke-width="3"/>
+    </g>
+  </g>
+</svg>

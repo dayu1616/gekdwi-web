@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IDB Space — Product Requirement Document</title>
+  <link rel="stylesheet" href="assets/css/prd.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <header class="cover">
+    <div class="cover__brand"><img src="assets/img/logo-idb.png" alt="IDB Bali"></div>
+    <div class="cover__eyebrow">Product Requirement Document</div>
+    <h1>IDB SPACE</h1>
+    <p class="cover__tagline">Ruang untuk Manajemen dan Aktivitas IDB Bali</p>
+    <div class="cover__rule"></div>
+    <p class="cover__subtitle">Sistem Peminjaman dan Pengelolaan Ruangan Kampus</p>
+
+    <table class="info-table">
+      <tr><th>Informasi Dokumen</th><th>Keterangan</th></tr>
+      <tr><td>Versi</td><td>2.0 — Alur pemohon, dashboard staf, dan pengalaman antarmuka</td></tr>
+      <tr><td>Tanggal</td><td>3 November 2026</td></tr>
+      <tr><td>Status</td><td>Rancangan untuk ditinjau pihak kampus</td></tr>
+      <tr><td>Pengguna utama</td><td>Mahasiswa, UKM, HMJ, staf pengelola, dan admin sistem</td></tr>
+    </table>
+
+    <div class="callout">
+      Dokumen ini merinci aturan ruangan, alur pemohon, alur staf real-time, pencegahan bentrok jadwal, fasilitas yang
+      diajukan, ketentuan antarmuka, kebutuhan data, keamanan, dan kriteria penerimaan. Bagian yang belum diputuskan
+      ditandai sebagai usulan.
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section class="doc-section">
+    <h2>1. Ringkasan Produk</h2>
+    <p><strong>IDB Space</strong> adalah sistem digital untuk mengajukan dan mengelola peminjaman ruangan di kampus
+      IDB Bali. Sistem memiliki dua pintu masuk yang dipisahkan: <strong>tautan pemohon</strong> untuk mahasiswa, UKM,
+      dan HMJ, serta <strong>tautan staf</strong> untuk pengelola ruangan. Pemohon menentukan hari, tanggal, jam mulai,
+      dan jam selesai terlebih dahulu. Setelah jadwal valid, sistem baru menampilkan ruangan yang sesuai aturan dan
+      ketersediaan. Staf memantau antrean secara real-time dan mengonfirmasi pengajuan dengan cepat.</p>
+    <p>Ruangan yang sudah dipesan pada waktu yang sama tetap terlihat agar pemohon memahami kondisinya, tetapi tombol
+      pilih dinonaktifkan. Setiap pengajuan wajib menyertakan alasan dan dapat menyertakan fasilitas yang dibutuhkan.
+      Slot yang sedang menunggu keputusan ditahan sementara agar tidak terjadi pengajuan ganda.</p>
+
+    <h3>1.1 Masalah yang Ingin Diselesaikan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:38%">Masalah</th><th>Kebutuhan solusi</th></tr></thead>
+      <tbody>
+        <tr><td>Ketersediaan ruangan tidak transparan.</td><td>Daftar ketersediaan per tanggal dan rentang waktu, diperbarui dari data pemesanan.</td></tr>
+        <tr><td>Risiko dua peminjam memilih slot yang sama.</td><td>Validasi konflik di server saat pengajuan dan saat persetujuan, ditambah penahanan slot.</td></tr>
+        <tr><td>Alasan peminjaman tidak jelas.</td><td>Kolom alasan/tujuan wajib diisi dan ditinjau staf.</td></tr>
+        <tr><td>Aturan setiap ruangan berbeda.</td><td>Aturan hari dan jam per ruangan dijalankan otomatis oleh sistem.</td></tr>
+        <tr><td>Fasilitas yang dibutuhkan tidak tercatat.</td><td>Pemohon memilih fasilitas yang dipinjam; staf melihatnya pada detail pengajuan.</td></tr>
+        <tr><td>Staf memeriksa permohonan satu per satu.</td><td>Dashboard real-time dengan antrean, filter, dan aksi konfirmasi cepat.</td></tr>
+        <tr><td>Pemohon tidak mengetahui status.</td><td>Halaman status, riwayat, catatan staf, dan notifikasi.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.2 Tujuan Produk</h3>
+    <ul>
+      <li>Mempermudah mahasiswa, UKM, dan HMJ mengajukan peminjaman ruangan.</li>
+      <li>Menampilkan ruangan yang tersedia setelah hari, tanggal, dan jam dipilih.</li>
+      <li>Mencegah bentrok jadwal dan pengajuan ganda pada slot yang sama.</li>
+      <li>Mempercepat staf mengonfirmasi pengajuan melalui dashboard real-time.</li>
+      <li>Mencatat fasilitas yang dipinjam agar ruangan disiapkan dengan tepat.</li>
+      <li>Menyediakan status, riwayat, dan jejak audit yang dapat diperiksa.</li>
+    </ul>
+
+    <h3>1.3 Indikator Keberhasilan (Usulan)</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:44%">Indikator</th><th>Target awal yang diusulkan</th></tr></thead>
+      <tbody>
+        <tr><td>Waktu memuat daftar ketersediaan</td><td>Kurang dari 2 detik (p95) setelah jadwal valid.</td></tr>
+        <tr><td>Pembaruan antrean staf</td><td>Kurang dari 3 detik setelah pengajuan masuk.</td></tr>
+        <tr><td>Waktu konfirmasi staf</td><td>Kurang dari 15 detik dari detail dibuka sampai keputusan disimpan.</td></tr>
+        <tr><td>Bentrok ganda yang tersimpan</td><td>0 kasus pada ruangan, tanggal, dan rentang waktu yang tumpang tindih.</td></tr>
+        <tr><td>Kelengkapan pengajuan</td><td>Minimal 95% pengajuan memiliki data wajib, alasan, dan fasilitas yang terisi.</td></tr>
+        <tr><td>Kepuasan pemohon</td><td>Minimal 4 dari 5 pada survei setelah pilot.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Target tersebut adalah usulan awal dan perlu disepakati serta diukur setelah sistem diuji.</p>
+
+    <h3>1.4 Ringkasan Aturan Inti</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:26%">Aturan</th><th>Ketentuan</th></tr></thead>
+      <tbody>
+        <tr><td>Ruangan akhir pekan</td><td>Lab iMac, Lecture 2B, A 1.2, dan Studio 3 hanya dapat dipinjam pada Sabtu dan Minggu, pukul 08.00–17.00.</td></tr>
+        <tr><td>Aula</td><td>Dapat dipinjam Senin–Jumat pukul 08.00–17.00; pada Sabtu harus selesai paling lambat 14.00; hari Minggu tidak tersedia.</td></tr>
+        <tr><td>Konflik</td><td>Ruangan yang sudah dipesan pada tanggal dan jam beririsan tetap tampil, tetapi tidak dapat dipilih.</td></tr>
+        <tr><td>Pengajuan</td><td>Alasan wajib diisi; hari, tanggal, dan jam dipilih sebelum daftar ruangan tampil.</td></tr>
+        <tr><td>Fasilitas</td><td>Pemohon memilih fasilitas yang dipinjam; pilihan tampil pada detail staf.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>1.5 Prinsip Produk</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:34%">Prinsip</th><th>Penerapan</th></tr></thead>
+      <tbody>
+        <tr><td>Jadwal dulu, ruangan kemudian</td><td>Daftar ruangan tidak tampil sebelum hari, tanggal, jam mulai, dan jam selesai valid.</td></tr>
+        <tr><td>Anti-bentrok sejak awal</td><td>Konflik diperiksa saat pengajuan, saat slot ditahan, dan saat staf menyetujui.</td></tr>
+        <tr><td>Real-time untuk staf</td><td>Pengajuan baru muncul tanpa refresh; aksi keputusan langsung memperbarui kalender.</td></tr>
+        <tr><td>Transparan, bukan hanya warna</td><td>Setiap status ruangan memiliki label teks dan penjelasan aturan.</td></tr>
+        <tr><td>Mobile-first</td><td>Alur pemohon nyaman digunakan dari ponsel melalui tautan UKM/mahasiswa.</td></tr>
+        <tr><td>Dapat diaudit</td><td>Setiap perubahan status mencatat waktu, akun pelaksana, dan catatan.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 2 -->
+  <section class="doc-section">
+    <h2>2. Ruang Lingkup</h2>
+
+    <h3>2.1 Fitur dalam Lingkup Versi 2.0</h3>
+    <ul>
+      <li>Dua tautan terpisah dan kontrol akses berbasis peran untuk pemohon dan staf.</li>
+      <li>Identifikasi/login pengguna, jenis pemohon, dan data organisasi.</li>
+      <li>Pemilihan hari, tanggal, jam mulai, dan jam selesai sebelum melihat ruangan.</li>
+      <li>Daftar ruangan dengan aturan hari/jam dan status ketersediaan.</li>
+      <li>Form pengajuan dengan alasan/tujuan wajib dan pilihan fasilitas.</li>
+      <li>Validasi jadwal, pencegahan konflik, dan penahanan slot sementara.</li>
+      <li>Nomor referensi, halaman status, riwayat, dan catatan staf.</li>
+      <li>Dashboard staf real-time, filter, detail, dan aksi setujui/tolak/minta perbaikan.</li>
+      <li>Kalender/timeline pemakaian ruangan dan blokir pemeliharaan.</li>
+      <li>Jejak audit, konfigurasi aturan ruangan, dan laporan penggunaan.</li>
+      <li>Landing page dengan banner slideshow foto kampus, identitas visual IDB Space, dan halaman fasilitas.</li>
+    </ul>
+
+    <h3>2.2 Di Luar Lingkup / Perlu Keputusan Lanjutan</h3>
+    <ul>
+      <li>Pembayaran atau biaya sewa ruangan.</li>
+      <li>Inventaris alat rinci, konsumsi, dan kebersihan di luar pilihan fasilitas dasar.</li>
+      <li>Integrasi penuh dengan SSO akademik; pada versi awal dapat memakai login/verifikasi terbatas.</li>
+      <li>Notifikasi WhatsApp/SMS; kanal dan integrasinya perlu diputuskan.</li>
+      <li>Tanda tangan digital dan integrasi kalender eksternal.</li>
+      <li>Peminjaman multi-hari, menginap, atau lintas tengah malam.</li>
+    </ul>
+
+    <h3>2.3 Dua Pintu Masuk dan Tautan</h3>
+    <p>Pemisahan alur dilakukan pada tingkat tautan dan hak akses. Pemohon tidak melihat menu, antrean, atau data
+      pemohon lain. Staf tidak menggunakan formulir pemohon untuk membuat pengajuan atas nama sendiri tanpa alur khusus
+      yang disepakati.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:22%">Segmen</th><th style="width:24%">Tautan contoh</th><th style="width:24%">Autentikasi</th><th>Fungsi utama</th></tr></thead>
+      <tbody>
+        <tr><td>Mahasiswa, UKM, HMJ</td><td>idbspace.idb.ac.id/pinjam</td><td>Login kampus atau verifikasi NIM/NIDN + email/WhatsApp</td><td>Cek ketersediaan, mengajukan, memantau status sendiri.</td></tr>
+        <tr><td>Staf pengelola ruangan</td><td>idbspace.idb.ac.id/staf</td><td>Akun staf + peran; 2FA disarankan</td><td>Antrean real-time, detail, setujui/tolak/minta perbaikan, kalender.</td></tr>
+        <tr><td>Admin sistem</td><td>idbspace.idb.ac.id/staf/pengaturan</td><td>Akun admin + peran</td><td>Mengatur ruangan, aturan, blokir jadwal, pengguna, dan laporan.</td></tr>
+        <tr><td>Cek status</td><td>idbspace.idb.ac.id/status/{kode}</td><td>Kode referensi + verifikasi pemilik</td><td>Melihat status tanpa membuka data pemohon lain.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Tautan /pinjam dapat dibagikan ke grup mahasiswa, UKM, dan HMJ atau dipasang sebagai QR di papan informasi.
+      Tautan /staf tidak boleh dipublikasikan dan wajib menggunakan HTTPS serta sesi login.</p>
+
+    <h3>2.4 Asumsi dan Hal yang Perlu Dikonfirmasi</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:26%">Topik</th><th>Status / keputusan yang dibutuhkan</th></tr></thead>
+      <tbody>
+        <tr><td>Jam operasional</td><td>Usulan default 08.00–17.00 WITA untuk semua ruangan. Aula pada Sabtu berakhir paling lambat 14.00.</td></tr>
+        <tr><td>Batas pengajuan</td><td>Usulan minimal H-1 pukul 12.00 dan maksimal 30 hari ke depan.</td></tr>
+        <tr><td>Durasi</td><td>Usulan minimum 1 jam dan maksimum 8 jam per pengajuan.</td></tr>
+        <tr><td>Penahanan slot</td><td>Usulan status Menunggu dan Perlu Perbaikan menahan slot sampai keputusan atau batas waktu.</td></tr>
+        <tr><td>Pembatalan</td><td>Usulan pemohon dapat membatalkan sampai H-1 pukul 12.00; setelah itu melalui staf.</td></tr>
+        <tr><td>Lampiran</td><td>Surat/proposal tidak wajib pada versi awal, tetapi dapat diminta staf untuk kegiatan tertentu.</td></tr>
+        <tr><td>Hak persetujuan</td><td>Perlu menetapkan staf yang berwenang dan backup saat staf utama tidak tersedia.</td></tr>
+        <tr><td>Notifikasi</td><td>Usulan notifikasi dalam aplikasi dan email; WhatsApp/SMS menjadi fase berikutnya.</td></tr>
+        <tr><td>Integrasi identitas</td><td>SSO kampus disarankan, tetapi validasi NIM/NIDN dan email dapat menjadi fallback.</td></tr>
+        <tr><td>Retensi data</td><td>Ikuti kebijakan kampus; usulan data pengajuan disimpan 2 tahun untuk audit.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 3 -->
+  <section class="doc-section">
+    <h2>3. Pengguna dan Hak Akses</h2>
+    <p>Sistem membedakan pemohon, staf pengelola, dan admin. Hak akses diperiksa di server pada setiap permintaan, bukan
+      hanya dengan menyembunyikan tombol di antarmuka.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:18%">Peran</th><th style="width:26%">Kebutuhan</th><th style="width:30%">Hak akses utama</th><th>Batasan</th></tr></thead>
+      <tbody>
+        <tr><td>Mahasiswa</td><td>Meminjam ruangan untuk kegiatan yang diizinkan.</td><td>Melihat ketersediaan, mengajukan, melihat status dan riwayat sendiri.</td><td>Tidak melihat pengajuan atau data pribadi pemohon lain.</td></tr>
+        <tr><td>UKM</td><td>Mengajukan untuk kegiatan organisasi kemahasiswaan.</td><td>Fitur pemohon; nama UKM dan penanggung jawab dicatat.</td><td>Hanya mengelola pengajuan milik UKM yang terdaftar.</td></tr>
+        <tr><td>HMJ</td><td>Mengajukan untuk kegiatan jurusan.</td><td>Fitur pemohon; nama HMJ dan penanggung jawab dicatat.</td><td>Hanya mengelola pengajuan milik HMJ yang terdaftar.</td></tr>
+        <tr><td>Staf pengelola ruangan</td><td>Memeriksa aturan, jadwal, fasilitas, dan alasan pengajuan.</td><td>Dashboard, filter, detail, setujui/tolak/minta perbaikan, catatan, kalender.</td><td>Tidak mengubah aturan ruangan; keputusan tercatat atas nama akun.</td></tr>
+        <tr><td>Admin sistem</td><td>Mengelola konfigurasi dan data master.</td><td>Mengatur ruangan, aturan, blokir pemeliharaan, pengguna, peran, dan ekspor laporan.</td><td>Tidak otomatis menjadi approver kecuali diberi peran staf.</td></tr>
+        <tr><td>Pimpinan (opsional)</td><td>Memantau penggunaan ruangan.</td><td>Melihat ringkasan dan laporan agregat.</td><td>Tidak melihat detail pribadi pemohon tanpa kewenangan.</td></tr>
+      </tbody>
+    </table>
+    <div class="callout">Usulan versi awal: satu akun memiliki satu peran utama. Jika seseorang perlu menjadi staf sekaligus
+      pemohon, gunakan akun terpisah atau alur khusus yang disetujui admin.</div>
+  </section>
+
+  <!-- 4 -->
+  <section class="doc-section">
+    <h2>4. Data Ruangan dan Aturan Ketersediaan</h2>
+    <p>Aturan berikut adalah kebutuhan inti. Sistem memeriksa aturan ini sebelum menampilkan ruangan yang bisa dipilih,
+      saat pengajuan dikirim, dan saat staf menyetujui.</p>
+
+    <h3>4.1 Daftar Ruangan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:18%">Ruangan</th><th style="width:20%">Hari yang diizinkan</th><th style="width:22%">Jam penggunaan (usulan)</th><th>Aturan khusus</th></tr></thead>
+      <tbody>
+        <tr><td>Lab iMac</td><td>Sabtu dan Minggu</td><td>08.00–17.00</td><td>Hanya akhir pekan; tidak dapat dipinjam Senin–Jumat.</td></tr>
+        <tr><td>Lecture 2B</td><td>Sabtu dan Minggu</td><td>08.00–17.00</td><td>Hanya akhir pekan; tidak dapat dipinjam Senin–Jumat.</td></tr>
+        <tr><td>A 1.2</td><td>Sabtu dan Minggu</td><td>08.00–17.00</td><td>Hanya akhir pekan; tidak dapat dipinjam Senin–Jumat.</td></tr>
+        <tr><td>Studio 3</td><td>Sabtu dan Minggu</td><td>08.00–17.00</td><td>Hanya akhir pekan; tidak dapat dipinjam Senin–Jumat.</td></tr>
+        <tr><td>Aula</td><td>Senin–Jumat dan Sabtu</td><td>Senin–Jumat 08.00–17.00; Sabtu 08.00–14.00</td><td>Tidak tersedia hari Minggu. Pada Sabtu wajib selesai paling lambat pukul 14.00.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Jam operasional di atas adalah usulan default untuk perhitungan versi 2.0 dan wajib dikonfirmasi kampus.
+      Admin dapat mengubah jam per ruangan tanpa mengubah kode aplikasi.</p>
+
+    <h3>4.2 Matriks Ketersediaan per Hari</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Hari</th><th>Lab iMac</th><th>Lecture 2B</th><th>A 1.2</th><th>Studio 3</th><th>Aula</th></tr></thead>
+      <tbody>
+        <tr><td>Senin–Jumat</td><td>Tidak</td><td>Tidak</td><td>Tidak</td><td>Tidak</td><td>Ya (08.00–17.00)</td></tr>
+        <tr><td>Sabtu</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–14.00)</td></tr>
+        <tr><td>Minggu</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Ya (08.00–17.00)</td><td>Tidak</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Selain aturan hari, sistem tetap memeriksa bentrok jam, status pengajuan lain, dan blokir pemeliharaan.
+      Ruangan yang tidak memenuhi aturan tetap terlihat, tetapi tidak dapat dipilih.</p>
+
+    <h3>4.3 Aturan Operasional Peminjaman</h3>
+    <ul>
+      <li>Satu pengajuan hanya untuk satu ruangan, satu tanggal, dan satu rentang waktu yang berurutan.</li>
+      <li>Jam selesai harus lebih akhir daripada jam mulai dan tidak boleh melewati tengah malam.</li>
+      <li>Tanggal di masa lalu ditolak. Pengajuan minimal H-1 pukul 12.00 WITA (usulan).</li>
+      <li>Durasi 1–8 jam per pengajuan (usulan) dan seluruh rentang harus berada di dalam jam operasional ruangan.</li>
+      <li>Pengajuan berstatus Menunggu atau Perlu Perbaikan menahan slot sampai keputusan atau batas waktu.</li>
+      <li>Blokir pemeliharaan dari admin mengalahkan semua pengajuan dan tidak dapat dipilih pemohon.</li>
+      <li>Zona waktu seluruh sistem adalah Asia/Makassar (WITA, UTC+8).</li>
+    </ul>
+
+    <h3>4.4 Urutan Wajib: Jadwal Dulu, Ruangan Kemudian</h3>
+    <p>Pemohon wajib mengisi hari, tanggal, jam mulai, dan jam selesai terlebih dahulu. Tombol daftar ruangan tetap
+      nonaktif sampai jadwal valid. Sistem baru menampilkan ruangan beserta statusnya setelah langkah ini.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:8%">Langkah</th><th style="width:38%">Tindakan</th><th>Respons sistem</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Pilih hari dan tanggal.</td><td>Menampilkan nama hari otomatis; menolak tanggal masa lalu.</td></tr>
+        <tr><td>2</td><td>Isi jam mulai dan jam selesai.</td><td>Memvalidasi urutan jam, durasi, dan jam operasional.</td></tr>
+        <tr><td>3</td><td>Tekan “Cek ketersediaan”.</td><td>Memeriksa aturan ruangan dan konflik jadwal.</td></tr>
+        <tr><td>4</td><td>Sistem menampilkan daftar ruangan.</td><td>Ruangan tersedia dapat dipilih; yang tidak tersedia tetap terlihat dengan tombol nonaktif.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>4.5 Definisi Konflik Jadwal</h3>
+    <p>Dua pengajuan dinyatakan bentrok apabila menggunakan ruangan yang sama pada tanggal yang sama dan rentang waktunya
+      beririsan. Dengan interval [mulai, selesai), irisan terjadi bila mulai A &lt; selesai B dan mulai B &lt; selesai A.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:8%">Kasus</th><th style="width:28%">Jadwal yang sudah ada</th><th style="width:28%">Permintaan baru</th><th>Hasil</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Aula, 10.00–12.00</td><td>Aula, 11.00–13.00</td><td>Bentrok. Ruangan tetap tampil, tombol pilih nonaktif.</td></tr>
+        <tr><td>2</td><td>Aula, 10.00–12.00</td><td>Aula, 12.00–14.00</td><td>Tidak bentrok karena tepat setelah jadwal sebelumnya.</td></tr>
+        <tr><td>3</td><td>Aula, 10.00–12.00</td><td>Aula, 09.00–10.00</td><td>Tidak bentrok karena selesai tepat saat jadwal berikutnya mulai.</td></tr>
+        <tr><td>4</td><td>Aula, 10.00–12.00</td><td>Lab iMac, 10.00–12.00</td><td>Tidak bentrok; ruangan berbeda (jika hari sesuai aturan).</td></tr>
+        <tr><td>5</td><td>Aula, Sabtu 10.00–12.00</td><td>Aula, Minggu 10.00–12.00</td><td>Tidak bentrok; tanggal berbeda, tetapi Aula Minggu tetap ditolak aturan.</td></tr>
+        <tr><td>6</td><td>Tidak ada</td><td>Aula, Sabtu 13.00–15.00</td><td>Ditolak aturan karena melewati pukul 14.00.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Perlakuan untuk jadwal yang tepat berurutan adalah tidak bentrok. Jika kampus membutuhkan jeda persiapan,
+      buffer dapat ditambahkan sebagai aturan konfigurasi.</p>
+
+    <h3>4.6 Validasi Jadwal</h3>
+    <ul>
+      <li>Tanggal tidak boleh di masa lalu dan tidak boleh melewati batas pengajuan yang disepakati.</li>
+      <li>Jam selesai harus lebih akhir daripada jam mulai; durasi harus memenuhi batas minimum/maksimum.</li>
+      <li>Ruangan harus sesuai aturan hari dan jam, termasuk Aula pada Sabtu yang berakhir paling lambat 14.00.</li>
+      <li>Ketersediaan diperiksa ulang saat formulir dikirim dan saat staf menyetujui.</li>
+      <li>Jika status berubah saat pengajuan dikirim, sistem menampilkan pesan dan meminta pemohon memeriksa kembali.</li>
+    </ul>
+  </section>
+
+  <!-- 5 -->
+  <section class="doc-section">
+    <h2>5. Pengalaman Antarmuka dan Branding</h2>
+    <p>Antarmuka IDB Space dirancang agar terasa tenang, jelas, dan khas kampus IDB Bali. Identitas visual memakai warna
+      navy dengan aksen emas, tipografi tegas, dan banyak ruang kosong agar informasi jadwal mudah dipindai.</p>
+
+    <h3>5.1 Identitas Sistem</h3>
+    <ul>
+      <li>Nama sistem yang ditampilkan adalah <strong>IDB Space</strong> dengan tagline “Ruang Kampus IDB Bali”.</li>
+      <li>Logo IDB ditampilkan langsung tanpa kotak atau bingkai, hanya menggunakan berkas logo resmi yang diberikan.</li>
+      <li>Header tidak menampilkan tombol “Mulai pinjam”; ajakan utama berada pada banner dan kartu peran.</li>
+      <li>Nada bahasa ringkas, hangat, dan tidak birokratis.</li>
+    </ul>
+
+    <h3>5.2 Banner Slideshow Foto Kampus</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:30%">Ketentuan</th><th>Penerapan</th></tr></thead>
+      <tbody>
+        <tr><td>Sumber foto</td><td>Foto kampus IDB Bali yang disediakan pihak kampus.</td></tr>
+        <tr><td>Perilaku</td><td>Satu foto tampil pada satu waktu sebagai latar banner; berganti otomatis setiap 5 detik.</td></tr>
+        <tr><td>Transisi</td><td>Fade halus sekitar 1,2 detik agar pergantian terasa elegan.</td></tr>
+        <tr><td>Perulangan</td><td>Setelah foto terakhir, slideshow kembali ke foto pertama dan berulang tanpa henti.</td></tr>
+        <tr><td>Penyesuaian ukuran</td><td>Gunakan <span class="k">object-fit: cover</span> atau teknik setara agar foto memenuhi banner tanpa merusak proporsi.</td></tr>
+        <tr><td>Keterbacaan</td><td>Overlay transparan navy di atas foto agar tulisan tetap terbaca pada semua foto.</td></tr>
+        <tr><td>Fallback</td><td>Jika foto gagal dimuat, tampilkan latar cadangan berwarna navy.</td></tr>
+        <tr><td>Batasan</td><td>Tanpa suara, kontrol video, atau elemen dekoratif yang tidak diperlukan; ringan dan responsif.</td></tr>
+        <tr><td>Aksesibilitas</td><td>Hormati preferensi <span class="k">prefers-reduced-motion</span> dengan menonaktifkan transisi otomatis.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>5.3 Struktur Halaman dan Teks Utama</h3>
+    <ul>
+      <li><strong>Hero</strong> menampilkan judul <em>“Ajukan peminjaman ruangan”</em> (menggantikan “Ruang yang tepat, tanpa jadwal bentrok”).</li>
+      <li>Bagian <strong>Cara Kerja</strong> ditempatkan di bawah hero secara rapi, bukan di dalam hero.</li>
+      <li>Kartu mahasiswa memakai ajakan <em>“Pinjam ruangan”</em> (menggantikan “Pesan ruangan”).</li>
+      <li>Kartu staf memakai kalimat <em>“Konfirmasi cepat, keputusan tercatat rapi”</em> (menggantikan “Antrean bergerak. Keputusan tetap jelas.”).</li>
+      <li>Paragraf penjelas panjang pada kartu staf dihapus agar kartu lebih ringkas.</li>
+      <li>Bagian fasilitas dan aturan ruangan ditampilkan setelah dua pintu masuk.</li>
+    </ul>
+
+    <h3>5.4 Fasilitas</h3>
+    <p>Saat mengajukan peminjaman, pemohon memilih fasilitas yang akan dipinjam. Daftar awal fasilitas:</p>
+    <table class="tbl">
+      <thead><tr><th style="width:30%">Fasilitas</th><th>Kegunaan umum</th></tr></thead>
+      <tbody>
+        <tr><td>Proyektor</td><td>Presentasi, kelas, dan pemutaran materi.</td></tr>
+        <tr><td>Layar / TV</td><td>Visual, media, dan presentasi alternatif.</td></tr>
+        <tr><td>Sound system</td><td>Acara, musik, dan pengumuman.</td></tr>
+        <tr><td>Mikrofon</td><td>Bicara di depan peserta dan MC.</td></tr>
+        <tr><td>AC</td><td>Kenyamanan ruangan.</td></tr>
+        <tr><td>Papan tulis</td><td>Diskusi, belajar, dan perencanaan.</td></tr>
+        <tr><td>Meja &amp; kursi</td><td>Penataan peserta sesuai kegiatan.</td></tr>
+        <tr><td>Koneksi internet</td><td>Kerja, akses data, dan kelas daring.</td></tr>
+        <tr><td>Panggung</td><td>Acara besar dan penampilan.</td></tr>
+        <tr><td>Tata cahaya</td><td>Produksi, panggung, dan rekaman.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Fasilitas yang dipilih tampil pada ringkasan pemohon dan detail pengajuan staf. Ketersediaan fasilitas
+      per ruangan dapat diatur admin sebagai data master.</p>
+
+    <h3>5.5 Aksesibilitas Antarmuka</h3>
+    <ul>
+      <li>Status tidak dibedakan hanya dengan warna; setiap status memiliki label teks.</li>
+      <li>Kontras teks memadai, fokus keyboard terlihat, dan seluruh kontrol dapat digunakan tanpa mouse.</li>
+      <li>Tata letak responsif dari ponsel hingga desktop tanpa horizontal scroll.</li>
+      <li>Form memiliki label eksplisit dan pesan kesalahan yang terbaca pembaca layar.</li>
+    </ul>
+  </section>
+
+  <!-- 6 -->
+  <section class="doc-section">
+    <h2>6. Alur Pemohon (Mahasiswa/UKM/HMJ)</h2>
+    <p>Alur ini adalah satu-satunya tampilan yang dilihat mahasiswa, UKM, dan HMJ. Tidak ada menu staf, data pemohon lain,
+      atau aksi persetujuan. Tautan dapat dibuka dari ponsel melalui /pinjam.</p>
+
+    <div class="flow">
+      <div class="flow__step"><b>01</b>Pilih hari dan tanggal</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>02</b>Pilih jam mulai dan selesai</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>03</b>Cek ketersediaan</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>04</b>Pilih ruangan, alasan, fasilitas</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>05</b>Kirim dan pantau status</div>
+    </div>
+
+    <h3>6.1 Langkah Penggunaan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Langkah</th><th style="width:40%">Tindakan pengguna</th><th>Respons sistem</th></tr></thead>
+      <tbody>
+        <tr><td>1. Masuk</td><td>Membuka tautan /pinjam, memilih jenis pemohon (Mahasiswa/UKM/HMJ), dan mengisi identitas.</td><td>Memverifikasi identitas dan menampilkan formulir yang sesuai.</td></tr>
+        <tr><td>2. Tentukan hari dan tanggal</td><td>Memilih tanggal pada kalender. Nama hari ditampilkan otomatis.</td><td>Menolak tanggal masa lalu dan menampilkan batas pengajuan.</td></tr>
+        <tr><td>3. Tentukan jam</td><td>Mengisi jam mulai dan jam selesai.</td><td>Memvalidasi urutan, durasi, dan jam operasional.</td></tr>
+        <tr><td>4. Cek ketersediaan</td><td>Menekan tombol “Cek ketersediaan”.</td><td>Menampilkan semua ruangan dengan status dan alasan aturan.</td></tr>
+        <tr><td>5. Pilih ruangan</td><td>Memilih ruangan berstatus Tersedia.</td><td>Tombol pilih untuk ruangan terpakai/terlarang dinonaktifkan.</td></tr>
+        <tr><td>6. Isi alasan dan detail</td><td>Mengisi nama kegiatan, organisasi, alasan/tujuan, jumlah peserta, fasilitas, dan kontak.</td><td>Memvalidasi field wajib, panjang alasan, dan pilihan fasilitas.</td></tr>
+        <tr><td>7. Periksa dan kirim</td><td>Memeriksa ringkasan lalu mengirim pengajuan.</td><td>Mengecek ulang konflik, menahan slot, dan memberi nomor referensi.</td></tr>
+        <tr><td>8. Pantau status</td><td>Membuka halaman status atau tautan status.</td><td>Menampilkan status terbaru, catatan staf, dan langkah berikutnya.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.2 Field Form Pengajuan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:30%">Field</th><th style="width:14%">Wajib</th><th>Keterangan</th></tr></thead>
+      <tbody>
+        <tr><td>Jenis pemohon</td><td>Ya</td><td>Mahasiswa, UKM, atau HMJ.</td></tr>
+        <tr><td>Nama lengkap</td><td>Ya</td><td>Nama pemohon atau penanggung jawab.</td></tr>
+        <tr><td>NIM/NIDN</td><td>Ya</td><td>Divalidasi jika integrasi tersedia.</td></tr>
+        <tr><td>Nama UKM/HMJ</td><td>Kondisional</td><td>Wajib jika jenis pemohon UKM atau HMJ.</td></tr>
+        <tr><td>Jabatan/PIC</td><td>Kondisional</td><td>Penanggung jawab kegiatan organisasi.</td></tr>
+        <tr><td>Email dan WhatsApp</td><td>Ya</td><td>Untuk konfirmasi dan tindak lanjut.</td></tr>
+        <tr><td>Nama kegiatan</td><td>Ya</td><td>Nama kegiatan yang akan dilakukan.</td></tr>
+        <tr><td>Hari</td><td>Ya (otomatis)</td><td>Diturunkan dari tanggal; tidak dapat diedit.</td></tr>
+        <tr><td>Tanggal penggunaan</td><td>Ya</td><td>Dipilih sebelum melihat ruangan.</td></tr>
+        <tr><td>Jam mulai dan selesai</td><td>Ya</td><td>Rentang waktu peminjaman pada hari yang sama.</td></tr>
+        <tr><td>Ruangan</td><td>Ya</td><td>Hanya ruangan berstatus Tersedia yang dapat dipilih.</td></tr>
+        <tr><td>Alasan/tujuan peminjaman</td><td>Ya</td><td>Penjelasan singkat; minimal 20 karakter (usulan).</td></tr>
+        <tr><td>Fasilitas yang dipinjam</td><td>Ya (usulan)</td><td>Pilihan fasilitas yang dibutuhkan selama kegiatan.</td></tr>
+        <tr><td>Jumlah peserta</td><td>Ya (usulan)</td><td>Perlu dikonfirmasi apakah wajib pada versi awal.</td></tr>
+        <tr><td>Lampiran</td><td>Tidak</td><td>Surat/proposal jika diminta staf.</td></tr>
+        <tr><td>Pernyataan</td><td>Ya</td><td>Menyatakan data benar dan mematuhi aturan kampus.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Alasan peminjaman tidak boleh kosong. Contoh pesan: “Alasan peminjaman wajib diisi.” Staf dapat meminta
+      perbaikan jika alasan dinilai belum jelas.</p>
+
+    <h3>6.3 Tampilan Kartu Ruangan</h3>
+    <p>Semua ruangan yang relevan tetap ditampilkan. Ruangan yang tidak dapat dipinjam tidak disembunyikan, tetapi diberi
+      label teks dan tombol pilih nonaktif.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:22%">Status ruangan</th><th style="width:40%">Label yang dilihat pemohon</th><th>Perilaku</th></tr></thead>
+      <tbody>
+        <tr><td>Tersedia</td><td>“Tersedia”</td><td>Tombol “Pilih ruangan” aktif.</td></tr>
+        <tr><td>Sudah dipesan</td><td>“Tidak tersedia pada waktu ini” dan “Dipesan 10.00–12.00”</td><td>Tetap terlihat; tombol pilih nonaktif.</td></tr>
+        <tr><td>Tidak sesuai aturan</td><td>“Tidak dapat dipinjam pada hari/jam ini”</td><td>Tetap terlihat; tombol nonaktif; alasan aturan ditampilkan.</td></tr>
+        <tr><td>Menunggu keputusan</td><td>“Sedang ditahan untuk pengajuan lain”</td><td>Tetap terlihat; tombol nonaktif sampai slot dilepas.</td></tr>
+        <tr><td>Perlu perbaikan</td><td>“Menunggu perbaikan pemohon”</td><td>Tetap terlihat; tombol nonaktif selama slot ditahan.</td></tr>
+        <tr><td>Pemeliharaan</td><td>“Ditutup untuk pemeliharaan”</td><td>Tetap terlihat; tombol nonaktif.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Status tidak boleh dibedakan hanya dengan warna. Setiap kartu wajib memiliki label teks yang jelas,
+      sehingga tetap terbaca oleh pengguna dengan kebutuhan aksesibilitas.</p>
+
+    <h3>6.4 Status Pengajuan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Status</th><th style="width:44%">Makna</th><th>Yang dapat dilakukan pemohon</th></tr></thead>
+      <tbody>
+        <tr><td>Draft (opsional)</td><td>Form belum dikirim.</td><td>Mengubah atau menghapus draft.</td></tr>
+        <tr><td>Menunggu</td><td>Pengajuan diterima dan slot ditahan sementara.</td><td>Melihat detail; menunggu keputusan staf.</td></tr>
+        <tr><td>Perlu Perbaikan</td><td>Data atau alasan perlu dilengkapi.</td><td>Memperbaiki dan mengirim ulang sebelum batas waktu.</td></tr>
+        <tr><td>Disetujui</td><td>Permohonan diterima dan slot menjadi final.</td><td>Melihat informasi persetujuan dan kalender.</td></tr>
+        <tr><td>Ditolak</td><td>Permohonan tidak diterima.</td><td>Melihat alasan penolakan; mengajukan jadwal lain.</td></tr>
+        <tr><td>Dibatalkan</td><td>Dibatalkan oleh pemohon atau staf.</td><td>Melihat riwayat pembatalan.</td></tr>
+        <tr><td>Kedaluwarsa</td><td>Slot dilepas karena melewati batas keputusan.</td><td>Mengajukan ulang jika jadwal masih tersedia.</td></tr>
+        <tr><td>Selesai</td><td>Waktu penggunaan sudah lewat.</td><td>Melihat riwayat dan detail kegiatan.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>6.5 Setelah Pengajuan Dikirim</h3>
+    <ul>
+      <li>Sistem memberi nomor referensi unik, misalnya IDB-2026-000123.</li>
+      <li>Status awal adalah Menunggu; slot ditahan sementara sampai staf memutuskan.</li>
+      <li>Pemohon dapat membuka halaman status untuk melihat catatan staf dan riwayat.</li>
+      <li>Jika diminta perbaikan, pemohon memperbaiki data dan mengirim ulang sebelum batas waktu.</li>
+      <li>Notifikasi dalam aplikasi wajib; email/WhatsApp bersifat opsional sampai integrasinya disepakati.</li>
+    </ul>
+
+    <h3>6.6 Catatan Privasi dan Etika</h3>
+    <ul>
+      <li>Halaman status hanya menampilkan pengajuan milik pemohon yang sedang login; akses melalui tautan status memerlukan verifikasi.</li>
+      <li>Pemohon lain hanya melihat blok waktu yang terisi, bukan identitas, alasan, atau kontak pemesan.</li>
+      <li>Staf hanya mengakses data yang relevan untuk memverifikasi pengajuan dan tidak menyebarkannya ke pihak lain.</li>
+      <li>Data pribadi tidak ditampilkan pada halaman publik atau pesan notifikasi yang dapat dilihat orang lain.</li>
+    </ul>
+
+    <h3>6.7 Pesan Validasi Utama</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:36%">Pemicu</th><th>Pesan</th></tr></thead>
+      <tbody>
+        <tr><td>Belum memilih jadwal</td><td>“Pilih hari dan tanggal terlebih dahulu.”</td></tr>
+        <tr><td>Jam tidak valid</td><td>“Jam selesai harus lebih akhir daripada jam mulai.”</td></tr>
+        <tr><td>Ruangan akhir pekan dipilih di hari kerja</td><td>“Lab iMac hanya dapat dipinjam pada hari Sabtu dan Minggu.”</td></tr>
+        <tr><td>Aula dipilih hari Minggu</td><td>“Aula tidak dapat dipinjam pada hari Minggu.”</td></tr>
+        <tr><td>Aula Sabtu melewati 14.00</td><td>“Aula pada hari Sabtu harus selesai paling lambat pukul 14.00.”</td></tr>
+        <tr><td>Ruangan sudah dipesan</td><td>“Ruangan tidak tersedia pada rentang waktu tersebut. Pilih ruangan atau jadwal lain.”</td></tr>
+        <tr><td>Alasan kosong</td><td>“Alasan peminjaman wajib diisi.”</td></tr>
+        <tr><td>Jadwal berubah saat kirim</td><td>“Jadwal berubah saat Anda mengirim pengajuan. Periksa kembali ketersediaan.”</td></tr>
+        <tr><td>Slot ditahan</td><td>“Pengajuan Anda sedang ditahan sementara sampai staf memutuskan.”</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 7 -->
+  <section class="doc-section">
+    <h2>7. Alur Staf (Dashboard Real-Time)</h2>
+    <p>Tautan staf /staf terpisah dari tautan pemohon. Fokus alur ini adalah kecepatan dan akurasi: pengajuan baru muncul
+      tanpa refresh, staf dapat membuka detail dan mengambil keputusan dalam beberapa klik, dan kalender langsung
+      diperbarui setelah keputusan disimpan.</p>
+
+    <div class="flow">
+      <div class="flow__step"><b>01</b>Masuk dashboard</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>02</b>Lihat antrean real-time</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>03</b>Buka dan verifikasi</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>04</b>Setujui atau tolak</div>
+      <div class="flow__arrow">›</div>
+      <div class="flow__step"><b>05</b>Slot terkunci dan audit</div>
+    </div>
+
+    <h3>7.1 Akses dan Prioritas Antrean</h3>
+    <ul>
+      <li>Staf masuk melalui /staf dengan akun staf dan peran yang sesuai; 2FA disarankan.</li>
+      <li>Halaman awal menampilkan antrean Menunggu, diurutkan berdasarkan tanggal kegiatan terdekat lalu waktu pengajuan.</li>
+      <li>Pengajuan untuk kegiatan dalam 24 jam diberi prioritas dan penanda khusus.</li>
+      <li>Staf hanya melihat data yang diperlukan untuk memverifikasi pengajuan.</li>
+      <li>Semua aksi keputusan tercatat atas nama akun staf yang sedang login.</li>
+    </ul>
+
+    <h3>7.2 Komponen Dashboard</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:18%">Area</th><th style="width:44%">Isi</th><th>Tujuan</th></tr></thead>
+      <tbody>
+        <tr><td>Ringkasan</td><td>Jumlah Menunggu, Disetujui hari ini, Perlu Perbaikan, Ditolak.</td><td>Memberi gambaran beban kerja sekilas.</td></tr>
+        <tr><td>Antrean real-time</td><td>Nomor referensi, pemohon, organisasi, ruangan, hari/tanggal/jam, cuplikan alasan, waktu menunggu.</td><td>Memprioritaskan pengajuan yang perlu diproses.</td></tr>
+        <tr><td>Aksi cepat</td><td>Setujui, Tolak, Minta Perbaikan, Buka detail.</td><td>Mengurangi langkah untuk keputusan rutin.</td></tr>
+        <tr><td>Filter dan pencarian</td><td>Tanggal, ruangan, status, jenis pemohon, nama kegiatan, nomor referensi.</td><td>Menemukan pengajuan tertentu dengan cepat.</td></tr>
+        <tr><td>Kalender/timeline</td><td>Tampilan harian/mingguan per ruangan; blok terisi dan blok pemeliharaan.</td><td>Memantau bentrok dan pemakaian ruangan.</td></tr>
+        <tr><td>Indikator verifikasi</td><td>Aturan hari/jam, status konflik, fasilitas, sisa waktu penahanan slot.</td><td>Membantu staf memutuskan tanpa membuka banyak tab.</td></tr>
+        <tr><td>Notifikasi</td><td>Toast dan badge untuk pengajuan baru; suara opsional.</td><td>Memberi sinyal real-time saat staf membuka dashboard.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.3 Langkah Kerja Staf</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Langkah</th><th style="width:40%">Tindakan staf</th><th>Respons sistem</th></tr></thead>
+      <tbody>
+        <tr><td>1. Masuk dashboard</td><td>Membuka /staf dan melihat antrean.</td><td>Menampilkan data terbaru dan koneksi real-time.</td></tr>
+        <tr><td>2. Prioritaskan</td><td>Memfilter tanggal, ruangan, atau jenis pemohon.</td><td>Menampilkan hasil filter dan penanda urgensi.</td></tr>
+        <tr><td>3. Buka detail</td><td>Membuka panel detail pengajuan.</td><td>Menampilkan identitas, kegiatan, alasan, fasilitas, jadwal, lampiran, dan riwayat.</td></tr>
+        <tr><td>4. Verifikasi</td><td>Memeriksa aturan ruangan, konflik, fasilitas, dan kelengkapan alasan.</td><td>Menampilkan hasil cek otomatis; tombol setujui hanya aktif jika lolos.</td></tr>
+        <tr><td>5. Putuskan</td><td>Menyetujui, menolak, atau meminta perbaikan dengan catatan.</td><td>Menyimpan keputusan, memperbarui status, dan mencatat audit.</td></tr>
+        <tr><td>6. Tindak lanjut</td><td>Memantau kalender dan pengajuan yang perlu perbaikan.</td><td>Memperbarui kalender dan mengirim notifikasi ke pemohon.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.4 Konfirmasi Cepat</h3>
+    <ul>
+      <li>Tombol Setujui tersedia langsung pada baris antrean dan panel detail.</li>
+      <li>Sebelum menyimpan, sistem menampilkan ringkasan singkat: ruangan, hari/tanggal, jam, pemohon, alasan, dan fasilitas.</li>
+      <li>Staf dapat menambahkan catatan opsional saat menyetujui; catatan wajib saat menolak atau meminta perbaikan.</li>
+      <li>Setelah keputusan, fokus otomatis berpindah ke pengajuan berikutnya agar antrean cepat selesai.</li>
+      <li>Jika slot sudah berubah sejak pengajuan dikirim, tombol setujui diblokir dan sistem menampilkan konflik terbaru.</li>
+      <li>Klik ganda dicegah dengan idempotency key dan status tombol selama proses simpan.</li>
+    </ul>
+    <div class="callout">Target operasional: staf dapat membuka detail dan menyimpan keputusan dalam waktu kurang dari
+      15 detik untuk pengajuan yang datanya lengkap dan tidak memiliki konflik.</div>
+
+    <h3>7.5 Efek Setiap Keputusan</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Keputusan</th><th style="width:22%">Input wajib</th><th style="width:34%">Efek</th><th>Status slot</th></tr></thead>
+      <tbody>
+        <tr><td>Setujui</td><td>Catatan opsional</td><td>Status Disetujui; pemohon dan kalender diperbarui.</td><td>Terkunci final.</td></tr>
+        <tr><td>Tolak</td><td>Alasan penolakan</td><td>Status Ditolak; alasan terlihat pemohon.</td><td>Dilepas.</td></tr>
+        <tr><td>Minta Perbaikan</td><td>Catatan perbaikan</td><td>Status Perlu Perbaikan; pemohon dapat mengubah dan mengirim ulang.</td><td>Ditahan sampai batas waktu.</td></tr>
+        <tr><td>Batalkan</td><td>Alasan pembatalan</td><td>Status Dibatalkan; riwayat tetap tersimpan.</td><td>Dilepas.</td></tr>
+        <tr><td>Tandai Selesai</td><td>Otomatis/manual</td><td>Status Selesai setelah waktu penggunaan lewat.</td><td>Dilepas untuk jadwal berikutnya.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>7.6 Contoh Konfirmasi Tiga Klik</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:8%">Langkah</th><th style="width:30%">Aksi staf</th><th>Yang terjadi</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Membuka baris antrean Menunggu.</td><td>Panel detail terbuka; identitas, jadwal, alasan, fasilitas, dan hasil cek aturan terlihat.</td></tr>
+        <tr><td>2</td><td>Memeriksa ringkasan verifikasi.</td><td>Sistem menandai konflik dan kelengkapan; tombol Setujui aktif hanya jika lolos.</td></tr>
+        <tr><td>3</td><td>Menekan Setujui.</td><td>Keputusan tersimpan, kalender diperbarui, pemohon diberi tahu, dan fokus pindah ke antrean berikutnya.</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Alur tiga klik ini adalah target pengalaman, bukan aturan kaku. Pengajuan yang meragukan tetap dapat
+      dibuka lebih lama atau dimintai perbaikan.</p>
+
+    <h3>7.7 Real-Time, SLA, dan Eskalasi</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:26%">Aspek</th><th>Ketentuan usulan</th></tr></thead>
+      <tbody>
+        <tr><td>Pembaruan antrean</td><td>Pengajuan baru dan perubahan status tampil kurang dari 3 detik melalui SSE/WebSocket; fallback polling setiap 10 detik.</td></tr>
+        <tr><td>Penahanan slot</td><td>Slot ditahan selama status Menunggu atau Perlu Perbaikan sampai keputusan atau batas waktu.</td></tr>
+        <tr><td>Pengingat</td><td>Pengingat staf jika pengajuan belum diputuskan setelah 4 jam kerja.</td></tr>
+        <tr><td>Eskalasi</td><td>Pengajuan untuk kegiatan kurang dari 24 jam yang masih Menunggu dieskalasi ke admin/koordinator.</td></tr>
+        <tr><td>Kedaluwarsa</td><td>Jika belum diputuskan sampai 12 jam sebelum kegiatan, slot dilepas otomatis dan pemohon diberi tahu (usulan).</td></tr>
+        <tr><td>Target keputusan</td><td>90% pengajuan diputuskan dalam 1 hari kerja; pengajuan mendesak diprioritaskan.</td></tr>
+        <tr><td>Sumber kebenaran</td><td>Status di database adalah sumber kebenaran; halaman status pemohon dan dashboard staf membaca data yang sama.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 8 -->
+  <section class="doc-section">
+    <h2>8. Konflik, Penahanan Slot, dan Visibilitas</h2>
+    <p>Aturan konflik harus ditegakkan di server dan database, bukan hanya di tampilan. Ini mencegah dua pengguna
+      menyimpan pengajuan pada slot yang sama hampir bersamaan.</p>
+
+    <h3>8.1 Status yang Menahan Slot</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:24%">Status</th><th style="width:16%">Menahan slot?</th><th>Catatan</th></tr></thead>
+      <tbody>
+        <tr><td>Menunggu</td><td>Ya</td><td>Slot ditahan sampai staf memutuskan atau batas waktu habis.</td></tr>
+        <tr><td>Perlu Perbaikan</td><td>Ya</td><td>Ditahan agar pemohon dapat memperbaiki tanpa kehilangan slot; batas waktu wajib.</td></tr>
+        <tr><td>Disetujui</td><td>Ya</td><td>Slot final dan tampil di kalender.</td></tr>
+        <tr><td>Ditolak</td><td>Tidak</td><td>Slot langsung dilepas.</td></tr>
+        <tr><td>Dibatalkan</td><td>Tidak</td><td>Slot dilepas; riwayat tetap disimpan.</td></tr>
+        <tr><td>Kedaluwarsa</td><td>Tidak</td><td>Slot dilepas otomatis.</td></tr>
+        <tr><td>Selesai</td><td>Tidak</td><td>Slot tersedia untuk tanggal berikutnya.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>8.2 Aturan Visibilitas</h3>
+    <ul>
+      <li>Semua ruangan yang relevan tetap terlihat oleh pemohon, termasuk yang sudah dipesan.</li>
+      <li>Pemohon melihat label “Tidak tersedia pada waktu ini” dan blok waktu yang terisi, tanpa data pribadi pemohon lain.</li>
+      <li>Staf melihat detail lengkap pengajuan dan seluruh blok waktu untuk keperluan verifikasi.</li>
+      <li>Pemohon hanya melihat pengajuan miliknya sendiri; akses ke pengajuan orang lain ditolak.</li>
+      <li>Ruangan yang tidak sesuai aturan tetap terlihat dengan alasan aturan yang jelas.</li>
+    </ul>
+
+    <h3>8.3 Pencegahan Bentrok Saat Bersamaan</h3>
+    <ul>
+      <li>Pemeriksaan konflik dilakukan di dalam transaksi database sebelum pengajuan disimpan.</li>
+      <li>Jika tersedia, gunakan constraint eksklusi pada rentang waktu per ruangan; jika tidak, gunakan row lock atau isolasi serializable.</li>
+      <li>Permintaan yang kalah dalam race condition menerima respons 409 Conflict dan pesan agar memilih slot lain.</li>
+      <li>Staf wajib memeriksa ulang konflik saat menyetujui, karena slot dapat berubah setelah pengajuan dibuat.</li>
+      <li>Setiap keputusan dan pelepasan slot dicatat dalam riwayat agar dapat diaudit.</li>
+    </ul>
+
+    <h3>8.4 Blokir Pemeliharaan dan Perubahan Jadwal</h3>
+    <ul>
+      <li>Admin dapat membuat blokir pemeliharaan untuk satu ruangan dan rentang waktu tertentu.</li>
+      <li>Blokir pemeliharaan mengalahkan pengajuan yang sudah ada; jika bentrok, staf harus membatalkan atau memindahkan pengajuan.</li>
+      <li>Pemohon tidak dapat memilih ruangan yang diblokir meskipun belum ada pengajuan.</li>
+      <li>Perubahan aturan ruangan berlaku untuk pengajuan baru; pengajuan yang sudah disetujui tetap berlaku sesuai keputusan.</li>
+    </ul>
+  </section>
+
+  <!-- 9 -->
+  <section class="doc-section">
+    <h2>9. Kebutuhan Fungsional</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:10%">ID</th><th style="width:62%">Kebutuhan</th><th style="width:14%">Peran</th><th>Prioritas</th></tr></thead>
+      <tbody>
+        <tr><td>FR-01</td><td>Sistem menyediakan tautan pemohon dan tautan staf yang terpisah dengan kontrol akses berbasis peran.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-02</td><td>Pemohon hanya dapat melihat pengajuan miliknya; staf hanya dapat mengakses data sesuai peran.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-03</td><td>Hari, tanggal, jam mulai, dan jam selesai wajib diisi sebelum daftar ruangan ditampilkan.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-04</td><td>Sistem memvalidasi tanggal masa lalu, urutan jam, durasi, dan batas pengajuan.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-05</td><td>Sistem menerapkan aturan hari dan jam untuk Lab iMac, Lecture 2B, A 1.2, Studio 3, dan Aula.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-06</td><td>Ruangan yang sudah dipesan tetap tampil, tetapi tombol pilihnya nonaktif dan diberi label teks.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-07</td><td>Sistem mencegah pengajuan dan persetujuan yang menyebabkan konflik ruangan/tanggal/waktu.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-08</td><td>Status Menunggu dan Perlu Perbaikan menahan slot sampai keputusan atau batas waktu.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-09</td><td>Alasan/tujuan peminjaman wajib diisi dan disimpan bersama pengajuan.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-10</td><td>Pemohon dapat memilih dan menyimpan fasilitas yang dipinjam pada pengajuan.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-11</td><td>Dashboard staf menampilkan fasilitas yang dipinjam pada ringkasan dan detail pengajuan.</td><td>Staf</td><td>Tinggi</td></tr>
+        <tr><td>FR-12</td><td>Sistem memberi nomor referensi dan halaman status yang dapat diakses pemohon.</td><td>Sistem</td><td>Sedang</td></tr>
+        <tr><td>FR-13</td><td>Pemohon dapat melihat riwayat, catatan staf, dan alasan penolakan.</td><td>Pemohon</td><td>Tinggi</td></tr>
+        <tr><td>FR-14</td><td>Dashboard staf menampilkan pengajuan baru secara real-time tanpa refresh manual.</td><td>Staf</td><td>Tinggi</td></tr>
+        <tr><td>FR-15</td><td>Staf dapat memfilter, mencari, dan memprioritaskan pengajuan berdasarkan tanggal, ruangan, dan status.</td><td>Staf</td><td>Tinggi</td></tr>
+        <tr><td>FR-16</td><td>Staf dapat menyetujui, menolak, atau meminta perbaikan dengan catatan dari antrean atau detail.</td><td>Staf</td><td>Tinggi</td></tr>
+        <tr><td>FR-17</td><td>Sistem memeriksa ulang konflik saat staf menyetujui dan menolak persetujuan jika slot sudah berubah.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-18</td><td>Staf dapat melihat kalender/timeline pemakaian dan menambahkan blokir pemeliharaan.</td><td>Staf/Admin</td><td>Sedang</td></tr>
+        <tr><td>FR-19</td><td>Setiap perubahan status mencatat waktu, akun pelaksana, dan catatan.</td><td>Sistem</td><td>Tinggi</td></tr>
+        <tr><td>FR-20</td><td>Admin dapat mengubah data ruangan, aturan hari/jam, fasilitas, dan pengguna tanpa mengubah kode.</td><td>Admin</td><td>Sedang</td></tr>
+        <tr><td>FR-21</td><td>Landing page menampilkan banner slideshow foto kampus yang berganti otomatis dan berulang.</td><td>Sistem</td><td>Sedang</td></tr>
+        <tr><td>FR-22</td><td>Antarmuka menampilkan nama IDB Space, logo tanpa bingkai, dan teks ajakan yang telah ditetapkan.</td><td>Sistem</td><td>Sedang</td></tr>
+        <tr><td>FR-23</td><td>Antarmuka pemohon responsif di ponsel dan memenuhi dasar aksesibilitas.</td><td>Sistem</td><td>Tinggi</td></tr>
+      </tbody>
+    </table>
+
+    <h3>9.1 Prioritas MVP</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:18%">Prioritas</th><th style="width:52%">Cakupan</th><th>Alasan</th></tr></thead>
+      <tbody>
+        <tr><td>Wajib (MVP)</td><td>Dua tautan, RBAC, jadwal dulu, aturan ruangan, pencegahan konflik, alasan wajib, fasilitas, status, dashboard real-time, dan keputusan staf.</td><td>Menjamin alur inti dan mencegah bentrok sejak peluncuran.</td></tr>
+        <tr><td>Penting</td><td>Kalender, filter, notifikasi dalam aplikasi, audit trail, slideshow banner, dan blokir pemeliharaan.</td><td>Mendukung operasional harian dan ketertelusuran.</td></tr>
+        <tr><td>Setelah peluncuran</td><td>SSO penuh, WhatsApp/SMS, ekspor laporan, dan integrasi kalender eksternal.</td><td>Meningkatkan efisiensi setelah alur dasar stabil.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 10 -->
+  <section class="doc-section">
+    <h2>10. Kebutuhan Nonfungsional</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:18%">Kategori</th><th style="width:40%">Kebutuhan</th><th>Target/ketentuan usulan</th></tr></thead>
+      <tbody>
+        <tr><td>Kinerja</td><td>Daftar ketersediaan dimuat cepat setelah jadwal valid.</td><td>Kurang dari 2 detik (p95).</td></tr>
+        <tr><td>Real-time</td><td>Antrean staf diperbarui tanpa refresh manual.</td><td>Kurang dari 3 detik; fallback polling 10 detik.</td></tr>
+        <tr><td>Keputusan</td><td>Simpan keputusan staf terasa instan.</td><td>Kurang dari 1,5 detik.</td></tr>
+        <tr><td>Ketersediaan</td><td>Layanan dapat diakses pada jam operasional.</td><td>99,5% per bulan.</td></tr>
+        <tr><td>Konkurensi</td><td>Menangani pengguna bersamaan tanpa bentrok data.</td><td>Uji beban untuk 200 pengguna aktif dan 50 pengiriman per menit.</td></tr>
+        <tr><td>Keamanan</td><td>Akses sesuai peran, koneksi aman, input tervalidasi.</td><td>HTTPS, RBAC, rate limit, CSRF protection, session timeout.</td></tr>
+        <tr><td>Privasi</td><td>Data pribadi dikumpulkan secukupnya.</td><td>Hanya staf berwenang melihat detail; retensi mengikuti kebijakan kampus.</td></tr>
+        <tr><td>Aksesibilitas</td><td>Dapat digunakan tanpa mouse dan terbaca pembaca layar.</td><td>WCAG 2.2 AA; label teks; kontras memadai; fokus terlihat.</td></tr>
+        <tr><td>Kompatibilitas</td><td>Berjalan di browser modern dan ponsel.</td><td>Dua versi terakhir Chrome, Edge, Safari, Firefox; Android/iOS.</td></tr>
+        <tr><td>Zona waktu</td><td>Tanggal dan jam konsisten.</td><td>Asia/Makassar (WITA, UTC+8) untuk semua tampilan dan penyimpanan jadwal.</td></tr>
+        <tr><td>Keandalan</td><td>Data tidak hilang dan dapat dipulihkan.</td><td>Backup harian; RPO 24 jam; RTO 4 jam (usulan).</td></tr>
+        <tr><td>Audit</td><td>Perubahan penting dapat ditelusuri.</td><td>Log status, akun, waktu, dan catatan; tidak dapat diubah pengguna biasa.</td></tr>
+        <tr><td>Pemeliharaan</td><td>Aturan ruangan dapat diubah tanpa deploy.</td><td>Konfigurasi oleh admin; perubahan dicatat.</td></tr>
+        <tr><td>Media banner</td><td>Slideshow foto kampus ringan dan tidak mengganggu fungsi dashboard.</td><td>Lazy-load gambar, transisi fade, fallback navy, hormati reduced-motion.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 11 -->
+  <section class="doc-section">
+    <h2>11. Data, Aturan Integritas, dan API</h2>
+
+    <h3>11.1 Entitas Utama</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Entitas</th><th>Atribut utama</th></tr></thead>
+      <tbody>
+        <tr><td>Pengguna</td><td>ID, nama, NIM/NIDN, email, WhatsApp, jenis pemohon, organisasi, peran, status akun.</td></tr>
+        <tr><td>Ruangan</td><td>ID, nama, lokasi/kapasitas, status aktif, jam operasional, fasilitas tersedia.</td></tr>
+        <tr><td>Aturan ruangan</td><td>ID ruangan, hari yang diizinkan, jam mulai/selesai, tanggal berlaku, aturan khusus.</td></tr>
+        <tr><td>Pengajuan</td><td>ID, nomor referensi, pemohon, kegiatan, alasan, fasilitas, tanggal, jam mulai/selesai, ruangan, status, waktu dibuat.</td></tr>
+        <tr><td>Riwayat status</td><td>ID pengajuan, status lama/baru, catatan, akun pelaksana, waktu.</td></tr>
+        <tr><td>Blokir ruangan</td><td>ID ruangan, tanggal, jam, alasan pemeliharaan, akun pembuat.</td></tr>
+        <tr><td>Notifikasi</td><td>ID penerima, jenis, isi, status baca, waktu kirim.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>11.2 Aturan Integritas Data</h3>
+    <ul>
+      <li>Setiap pengajuan memiliki ID unik dan nomor referensi yang tidak dapat diduga.</li>
+      <li>Penyimpanan tanggal dan jam menggunakan zona waktu WITA; konversi ke UTC hanya untuk kebutuhan integrasi.</li>
+      <li>Pemeriksaan konflik dan penyimpanan pengajuan dilakukan dalam satu transaksi.</li>
+      <li>Constraint database atau penguncian baris mencegah dua pengajuan pada slot yang sama.</li>
+      <li>Perubahan status menyimpan status sebelumnya, status baru, akun, waktu, dan catatan.</li>
+      <li>Pengajuan yang ditolak, dibatalkan, atau kedaluwarsa tetap tersimpan untuk audit.</li>
+      <li>Penghapusan ruangan menggunakan soft delete agar riwayat tetap valid.</li>
+    </ul>
+
+    <h3>11.3 Rute dan API Utama</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:10%">Metode</th><th style="width:44%">Endpoint</th><th style="width:30%">Fungsi</th><th>Akses</th></tr></thead>
+      <tbody>
+        <tr><td>GET</td><td>/pinjam</td><td>Halaman pemohon.</td><td>Publik/login</td></tr>
+        <tr><td>GET</td><td>/staf</td><td>Dashboard staf.</td><td>Staf</td></tr>
+        <tr><td>GET</td><td>/api/rooms/availability?date=&amp;start=&amp;end=</td><td>Daftar ruangan dan status.</td><td>Pemohon</td></tr>
+        <tr><td>POST</td><td>/api/bookings</td><td>Membuat pengajuan; cek konflik dan tahan slot.</td><td>Pemohon</td></tr>
+        <tr><td>GET</td><td>/api/bookings/{ref}</td><td>Melihat status pengajuan.</td><td>Pemilik/staf</td></tr>
+        <tr><td>PATCH</td><td>/api/bookings/{id}</td><td>Memperbaiki data saat Perlu Perbaikan.</td><td>Pemilik</td></tr>
+        <tr><td>POST</td><td>/api/bookings/{id}/cancel</td><td>Membatalkan pengajuan.</td><td>Pemilik/staf</td></tr>
+        <tr><td>GET</td><td>/api/staff/bookings?status=menunggu</td><td>Antrean pengajuan.</td><td>Staf</td></tr>
+        <tr><td>PATCH</td><td>/api/staff/bookings/{id}/decision</td><td>Setujui/tolak/minta perbaikan.</td><td>Staf</td></tr>
+        <tr><td>GET</td><td>/api/staff/stream</td><td>SSE untuk pembaruan real-time.</td><td>Staf</td></tr>
+        <tr><td>GET</td><td>/api/staff/calendar</td><td>Kalender/timeline ruangan.</td><td>Staf</td></tr>
+        <tr><td>POST</td><td>/api/admin/rooms/{id}/blocks</td><td>Membuat blokir pemeliharaan.</td><td>Admin</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Respons konflik menggunakan HTTP 409 dengan kode kesalahan yang dapat ditampilkan sebagai pesan ramah.
+      Endpoint yang mengubah data wajib memeriksa sesi, peran, dan kepemilikan sumber daya.</p>
+
+    <h3>11.4 Contoh Respons Konflik</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:8%">HTTP</th><th style="width:20%">Kode</th><th style="width:40%">Pesan pengguna</th><th>Tindakan sistem</th></tr></thead>
+      <tbody>
+        <tr><td>409</td><td>ROOM_CONFLICT</td><td>Ruangan tidak tersedia pada rentang waktu tersebut.</td><td>Menampilkan blok waktu yang terisi dan memperbarui daftar ruangan.</td></tr>
+        <tr><td>422</td><td>RULE_VIOLATION</td><td>Aula pada hari Sabtu harus selesai paling lambat pukul 14.00.</td><td>Menandai field jam dan menonaktifkan tombol kirim.</td></tr>
+        <tr><td>409</td><td>SLOT_HELD</td><td>Slot sedang ditahan untuk pengajuan lain.</td><td>Menampilkan status ditahan dan waktu pembaruan terakhir.</td></tr>
+        <tr><td>403</td><td>FORBIDDEN</td><td>Anda tidak memiliki akses ke pengajuan ini.</td><td>Menghentikan permintaan dan mencatat percobaan akses.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>11.5 Integrasi</h3>
+    <ul>
+      <li>SSO kampus (disarankan) untuk identitas mahasiswa dan staf; fallback verifikasi NIM/NIDN dan email.</li>
+      <li>Email transaksional untuk status pengajuan; WhatsApp/SMS menjadi fase berikutnya.</li>
+      <li>Ekspor kalender (.ics) untuk pengajuan yang disetujui (opsional).</li>
+      <li>Tidak ada integrasi pembayaran pada versi 2.0.</li>
+    </ul>
+  </section>
+
+  <!-- 12 -->
+  <section class="doc-section">
+    <h2>12. Kriteria Penerimaan</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:8%">ID</th><th style="width:46%">Skenario uji</th><th>Hasil yang diharapkan</th></tr></thead>
+      <tbody>
+        <tr><td>AC-01</td><td>Pemohon belum mengisi hari/tanggal/jam.</td><td>Daftar ruangan belum tampil; tombol cek ketersediaan nonaktif.</td></tr>
+        <tr><td>AC-02</td><td>Pemohon memilih Senin untuk Lab iMac.</td><td>Ruangan tetap terlihat, tetapi tidak dapat dipilih dan alasan aturan ditampilkan.</td></tr>
+        <tr><td>AC-03</td><td>Pemohon memilih Minggu untuk Aula.</td><td>Aula tidak dapat dipilih dan pesan aturan ditampilkan.</td></tr>
+        <tr><td>AC-04</td><td>Aula pada Sabtu dengan jam selesai 15.00.</td><td>Sistem menolak jadwal dan menampilkan batas pukul 14.00.</td></tr>
+        <tr><td>AC-05</td><td>Aula sudah dipesan 10.00–12.00; pemohon mencari 11.00–13.00.</td><td>Aula tetap tampil, label tidak tersedia, tombol pilih nonaktif.</td></tr>
+        <tr><td>AC-06</td><td>Aula sudah dipesan 10.00–12.00; pemohon mencari 12.00–14.00.</td><td>Slot dianggap tidak bentrok dan dapat dipilih jika aturan lain lolos.</td></tr>
+        <tr><td>AC-07</td><td>Pemohon mengosongkan alasan.</td><td>Form tidak dapat dikirim; pesan “Alasan peminjaman wajib diisi.” tampil.</td></tr>
+        <tr><td>AC-08</td><td>Dua pemohon mengirim slot sama hampir bersamaan.</td><td>Maksimal satu pengajuan menahan slot; yang lain menerima 409 dan pesan memilih jadwal lain.</td></tr>
+        <tr><td>AC-09</td><td>Pengajuan Menunggu dibuat.</td><td>Slot ditahan; pengajuan lain tidak dapat memilih slot tersebut.</td></tr>
+        <tr><td>AC-10</td><td>Pengajuan baru masuk saat dashboard staf terbuka.</td><td>Antrean bertambah kurang dari 3 detik tanpa refresh.</td></tr>
+        <tr><td>AC-11</td><td>Staf menyetujui pengajuan yang valid.</td><td>Status berubah menjadi Disetujui, kalender diperbarui, pemohon melihat status baru, audit tercatat.</td></tr>
+        <tr><td>AC-12</td><td>Staf menolak pengajuan.</td><td>Alasan penolakan tersimpan, slot dilepas, pemohon melihat alasan.</td></tr>
+        <tr><td>AC-13</td><td>Staf meminta perbaikan.</td><td>Pemohon dapat mengubah data; slot ditahan sampai batas waktu.</td></tr>
+        <tr><td>AC-14</td><td>Pemohon membuka pengajuan orang lain.</td><td>Akses ditolak; data tidak ditampilkan.</td></tr>
+        <tr><td>AC-15</td><td>Pemohon memilih fasilitas dan mengirim pengajuan.</td><td>Fasilitas tersimpan dan tampil pada ringkasan serta detail staf.</td></tr>
+        <tr><td>AC-16</td><td>Banner slideshow dibuka di landing page.</td><td>Foto berganti setiap 5 detik dengan fade, berulang, dan latar navy muncul jika foto gagal dimuat.</td></tr>
+        <tr><td>AC-17</td><td>Pemohon membuka tautan /pinjam dari ponsel.</td><td>Alur jadwal, kartu ruangan, form alasan/fasilitas, dan status dapat digunakan tanpa horizontal scroll.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>12.1 Matriks Uji Peran</h3>
+    <table class="tbl">
+      <thead><tr><th style="width:26%">Peran</th><th style="width:40%">Skenario</th><th>Hasil yang diharapkan</th></tr></thead>
+      <tbody>
+        <tr><td>Pemohon</td><td>Membuka /staf atau endpoint keputusan.</td><td>Akses ditolak dan diarahkan ke halaman yang sesuai.</td></tr>
+        <tr><td>Staf</td><td>Membuka detail pengajuan pemohon.</td><td>Diizinkan sesuai peran; aktivitas tercatat di audit.</td></tr>
+        <tr><td>Staf tanpa peran approver</td><td>Menekan tombol Setujui.</td><td>Tombol tidak tersedia dan endpoint menolak dengan 403.</td></tr>
+        <tr><td>Admin</td><td>Mengubah aturan atau membuat blokir.</td><td>Perubahan tersimpan dan berlaku untuk pengajuan baru.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 13 -->
+  <section class="doc-section">
+    <h2>13. Risiko dan Mitigasi</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:30%">Risiko</th><th style="width:26%">Dampak</th><th>Mitigasi</th></tr></thead>
+      <tbody>
+        <tr><td>Dua pengajuan masuk bersamaan.</td><td>Bentrok jadwal.</td><td>Transaksi database, constraint/locking, dan respons 409.</td></tr>
+        <tr><td>Status ketersediaan terlambat diperbarui.</td><td>Pemohon memilih slot yang baru dipesan.</td><td>SSE real-time untuk staf, cek ulang saat kirim, dan pesan perubahan jadwal.</td></tr>
+        <tr><td>Staf terlambat memproses.</td><td>Pemohon menunggu dan slot tertahan.</td><td>Antrean prioritas, pengingat, eskalasi, dan batas waktu penahanan.</td></tr>
+        <tr><td>Aturan ruangan berubah.</td><td>Informasi tidak konsisten.</td><td>Konfigurasi admin, tanggal berlaku aturan, dan audit perubahan.</td></tr>
+        <tr><td>Pemohon mengisi alasan tidak jelas.</td><td>Staf sulit menilai kebutuhan.</td><td>Field wajib dengan panjang minimum, contoh pengisian, dan alur minta perbaikan.</td></tr>
+        <tr><td>Fasilitas tidak tercatat.</td><td>Ruangan tidak siap dipakai.</td><td>Pilihan fasilitas wajib pada form dan tampil pada detail staf.</td></tr>
+        <tr><td>Notifikasi gagal terkirim.</td><td>Pemohon tidak mengetahui status.</td><td>Halaman status sebagai sumber kebenaran; notifikasi bersifat pelengkap.</td></tr>
+        <tr><td>Blokir pemeliharaan terlewat.</td><td>Ruangan tidak siap dipakai.</td><td>Blokir prioritas tinggi, kalender staf, dan pengingat pemeliharaan.</td></tr>
+        <tr><td>Data pribadi terekspos.</td><td>Pelanggaran privasi.</td><td>RBAC, minimisasi data, dan penyembunyian detail pemohon lain.</td></tr>
+        <tr><td>Foto banner gagal dimuat.</td><td>Banner kosong/tidak terbaca.</td><td>Latar cadangan navy dan overlay agar teks tetap terbaca.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 14 -->
+  <section class="doc-section">
+    <h2>14. Metrik dan Pelaporan</h2>
+    <p>Dashboard staf dan laporan periode membantu pengelola memantau beban kerja, pemakaian ruangan, dan kualitas layanan.</p>
+    <table class="tbl">
+      <thead><tr><th style="width:22%">Metrik</th><th style="width:48%">Definisi</th><th>Kegunaan</th></tr></thead>
+      <tbody>
+        <tr><td>Jumlah pengajuan</td><td>Total pengajuan per ruangan/periode.</td><td>Melihat permintaan dan tren.</td></tr>
+        <tr><td>Waktu keputusan</td><td>Selisih waktu pengajuan masuk dan keputusan staf.</td><td>Mengukur kecepatan layanan.</td></tr>
+        <tr><td>Rasio persetujuan</td><td>Persentase pengajuan disetujui, ditolak, dan dibatalkan.</td><td>Menilai kualitas pengajuan dan aturan.</td></tr>
+        <tr><td>Konflik dicegah</td><td>Jumlah percobaan bentrok yang ditolak sistem.</td><td>Mengukur efektivitas anti-bentrok.</td></tr>
+        <tr><td>Pemakaian ruangan</td><td>Jam terpakai dibagi jam tersedia per ruangan.</td><td>Melihat utilisasi dan kebutuhan ruangan.</td></tr>
+        <tr><td>Pemakaian fasilitas</td><td>Frekuensi fasilitas dipinjam per ruangan/periode.</td><td>Merencanakan pengadaan dan kesiapan alat.</td></tr>
+        <tr><td>Pembatalan/no-show</td><td>Pengajuan disetujui yang dibatalkan atau tidak digunakan.</td><td>Mengevaluasi kebijakan penahanan slot.</td></tr>
+        <tr><td>Kepuasan pemohon</td><td>Skor survei setelah penggunaan.</td><td>Mengukur pengalaman pemohon.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 15 -->
+  <section class="doc-section">
+    <h2>15. Tahapan Pengembangan</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:20%">Tahap</th><th style="width:44%">Fokus</th><th style="width:26%">Hasil</th><th>Estimasi usulan</th></tr></thead>
+      <tbody>
+        <tr><td>1. Validasi aturan</td><td>Konfirmasi jam operasional, batas pengajuan, durasi, pembatalan, dan penahanan slot.</td><td>Aturan final yang disepakati.</td><td>1 minggu</td></tr>
+        <tr><td>2. Desain UI/UX</td><td>Wireframe alur pemohon, dashboard staf, kartu ruangan, fasilitas, dan banner slideshow.</td><td>Rancangan yang diuji ke pengguna.</td><td>2 minggu</td></tr>
+        <tr><td>3. Pengembangan inti</td><td>Form, ketersediaan, konflik, hold slot, status, audit.</td><td>API dan basis data berjalan.</td><td>3–4 minggu</td></tr>
+        <tr><td>4. Antarmuka</td><td>Halaman pemohon, halaman status, dashboard staf, kalender, landing page.</td><td>Versi yang dapat diuji end-to-end.</td><td>3 minggu</td></tr>
+        <tr><td>5. Pengujian</td><td>Uji aturan, konflik, race condition, akses, perangkat, aksesibilitas.</td><td>Daftar bug dan hasil uji.</td><td>1–2 minggu</td></tr>
+        <tr><td>6. Pilot</td><td>Uji terbatas dengan beberapa UKM/HMJ dan staf.</td><td>Masukan dan perbaikan.</td><td>2 minggu</td></tr>
+        <tr><td>7. Peluncuran</td><td>Panduan, pelatihan staf, pemantauan, dan evaluasi.</td><td>Sistem siap dipakai.</td><td>1 minggu</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Estimasi bersifat usulan dan bergantung pada kesiapan integrasi identitas serta ketersediaan tim.</p>
+  </section>
+
+  <!-- 16 -->
+  <section class="doc-section">
+    <h2>16. Keputusan Sebelum Pengembangan</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:6%">No.</th><th style="width:44%">Pertanyaan</th><th>Catatan</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Jam operasional pasti setiap ruangan?</td><td>Default usulan 08.00–17.00; Aula Sabtu berakhir 14.00.</td></tr>
+        <tr><td>2</td><td>Berapa lama slot ditahan saat Menunggu?</td><td>Usulan sampai keputusan atau 12 jam sebelum kegiatan.</td></tr>
+        <tr><td>3</td><td>Batas minimum/maksimum durasi?</td><td>Usulan 1–8 jam per pengajuan.</td></tr>
+        <tr><td>4</td><td>Batas pengajuan ke depan?</td><td>Usulan minimal H-1 pukul 12.00 dan maksimal 30 hari.</td></tr>
+        <tr><td>5</td><td>Apakah ada jeda antar-peminjaman?</td><td>Usulan tidak ada pada v2; dapat ditambahkan sebagai buffer.</td></tr>
+        <tr><td>6</td><td>Apakah surat/proposal wajib?</td><td>Usulan opsional, dapat diminta staf untuk kegiatan tertentu.</td></tr>
+        <tr><td>7</td><td>Siapa yang berwenang menyetujui?</td><td>Tetapkan staf utama, backup, dan admin eskalasi.</td></tr>
+        <tr><td>8</td><td>Kanal notifikasi apa?</td><td>Usulan in-app + email; WhatsApp/SMS fase berikutnya.</td></tr>
+        <tr><td>9</td><td>Kapan pemohon boleh membatalkan?</td><td>Usulan sampai H-1 pukul 12.00; setelah itu melalui staf.</td></tr>
+        <tr><td>10</td><td>Berapa lama data disimpan?</td><td>Ikuti kebijakan kampus; usulan 2 tahun untuk audit.</td></tr>
+        <tr><td>11</td><td>Daftar fasilitas final dan ketersediaannya per ruangan?</td><td>Gunakan daftar awal pada bagian 5.4; admin dapat menyesuaikan.</td></tr>
+        <tr><td>12</td><td>Foto kampus dan logo resmi yang dipakai?</td><td>Sediakan berkas final; banner memakai fallback navy bila foto gagal dimuat.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 17 -->
+  <section class="doc-section">
+    <h2>17. Glosarium dan Penutup</h2>
+    <table class="tbl">
+      <thead><tr><th style="width:26%">Istilah</th><th>Arti</th></tr></thead>
+      <tbody>
+        <tr><td>PRD</td><td>Dokumen yang menjelaskan kebutuhan dan perilaku produk.</td></tr>
+        <tr><td>Pemohon</td><td>Mahasiswa, UKM, atau HMJ yang mengajukan peminjaman.</td></tr>
+        <tr><td>Staf</td><td>Pengelola ruangan yang memverifikasi dan memutuskan pengajuan.</td></tr>
+        <tr><td>Slot</td><td>Kombinasi ruangan, tanggal, jam mulai, dan jam selesai.</td></tr>
+        <tr><td>Hold</td><td>Penahanan slot sementara selama pengajuan menunggu keputusan.</td></tr>
+        <tr><td>Konflik jadwal</td><td>Peminjaman pada ruangan dan tanggal yang sama dengan rentang waktu beririsan.</td></tr>
+        <tr><td>Fasilitas</td><td>Peralatan atau layanan ruangan yang dipinjam bersama ruangan.</td></tr>
+        <tr><td>Real-time</td><td>Pembaruan data dengan cepat tanpa perlu refresh manual; metode teknis ditentukan saat desain.</td></tr>
+        <tr><td>RBAC</td><td>Role-Based Access Control; hak akses ditentukan oleh peran pengguna.</td></tr>
+        <tr><td>SLA</td><td>Service Level Agreement; target waktu layanan yang disepakati.</td></tr>
+        <tr><td>WITA</td><td>Waktu Indonesia Tengah (UTC+8), zona waktu Bali.</td></tr>
+        <tr><td>Audit trail</td><td>Catatan aktivitas penting seperti perubahan status dan pelaksananya.</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:22px;">IDB Space versi 2.0 adalah rancangan kebutuhan untuk peminjaman ruangan kampus IDB Bali. Dokumen ini
+      memisahkan alur pemohon dan staf, menetapkan aturan ruangan, mencatat fasilitas yang dipinjam, serta menjadikan
+      pencegahan bentrok dan konfirmasi real-time sebagai kebutuhan inti. Dokumen sebaiknya ditinjau oleh perwakilan
+      mahasiswa, UKM, HMJ, staf pengelola ruangan, dan penanggung jawab sistem sebelum desain teknis dan pengembangan
+      dimulai.</p>
+  </section>
+
+</div>
+</body>
+</html>

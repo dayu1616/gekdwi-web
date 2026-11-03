@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 560" role="img" aria-label="Ilustrasi interior kedai kopi dengan meja bar dan lampu gantung">
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F3E8D7"/>
+      <stop offset="1" stop-color="#E4CEAF"/>
+    </linearGradient>
+    <linearGradient id="light" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF6E3" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#FFF6E3" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="560" fill="url(#wall)"/>
+  <rect y="392" width="720" height="168" fill="#CFAC83"/>
+  <rect y="392" width="720" height="8" fill="#B08A5F"/>
+
+  <rect x="58" y="86" width="196" height="270" rx="8" fill="#BFD3CE"/>
+  <rect x="58" y="86" width="196" height="270" rx="8" fill="none" stroke="#9DB6B0" stroke-width="6"/>
+  <path d="M156 86v270M58 221h196" stroke="#9DB6B0" stroke-width="6"/>
+  <polygon points="58,356 254,356 300,430 20,430" fill="url(#light)" opacity="0.7"/>
+
+  <g fill="#5A3D2B">
+    <rect x="430" y="150" width="8" height="70" rx="4"/>
+    <rect x="560" y="130" width="8" height="90" rx="4"/>
+  </g>
+  <path d="M398 220h72l-14 34h-44z" fill="#3A2418"/>
+  <path d="M528 220h72l-14 34h-44z" fill="#3A2418"/>
+  <circle cx="434" cy="226" r="6" fill="#F2C578"/>
+  <circle cx="564" cy="226" r="6" fill="#F2C578"/>
+
+  <rect x="352" y="392" width="330" height="24" rx="6" fill="#6B4630"/>
+  <rect x="352" y="416" width="330" height="86" fill="#7C5338"/>
+  <g fill="#8E6244">
+    <rect x="374" y="438" width="120" height="46" rx="4"/>
+    <rect x="518" y="438" width="140" height="46" rx="4"/>
+  </g>
+
+  <g transform="translate(400 330)">
+    <rect x="0" y="0" width="46" height="52" rx="6" fill="#3A2418"/>
+    <rect x="8" y="8" width="30" height="20" rx="3" fill="#D9B77E"/>
+    <rect x="16" y="34" width="14" height="10" rx="2" fill="#E9DBC6"/>
+  </g>
+  <g transform="translate(470 322)">
+    <path d="M0 30h40l-5 40H5z" fill="#E9DBC6"/>
+    <ellipse cx="20" cy="30" rx="20" ry="7" fill="#F7EFE2"/>
+    <path d="M34 42q16 4 12 18" fill="none" stroke="#E9DBC6" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(560 300)">
+    <path d="M0 62h56l-8-62H8z" fill="#EAD9C0"/>
+    <g fill="#6E7F62">
+      <path d="M28 62C6 40 8 8 28 0c20 8 22 40 0 62z"/>
+      <path d="M28 62C48 46 46 22 30 14" fill="none" stroke="#55654B" stroke-width="3"/>
+      <path d="M28 62C10 48 12 26 26 18" fill="none" stroke="#55654B" stroke-width="3"/>
+    </g>
+  </g>
+
+  <g transform="translate(232 420)">
+    <rect x="0" y="0" width="86" height="12" rx="6" fill="#4A2F20"/>
+    <rect x="16" y="12" width="10" height="82" fill="#4A2F20"/>
+    <rect x="60" y="12" width="10" height="82" fill="#4A2F20"/>
+  </g>
+  <g transform="translate(268 356)">
+    <path d="M0 30h44l-6 44H6z" fill="#F1E4CF"/>
+    <ellipse cx="22" cy="30" rx="22" ry="7" fill="#FFFDF9"/>
+    <ellipse cx="22" cy="30" rx="16" ry="4" fill="#6F4A2E"/>
+  </g>
+
+  <g fill="#C8923F" opacity="0.85">
+    <circle cx="660" cy="120" r="10"/>
+    <circle cx="620" cy="88" r="6"/>
+    <circle cx="690" cy="80" r="4"/>
+  </g>
+</svg>
